@@ -20,7 +20,7 @@ COPY --from=build /build/target/hhs-case-management.war \
 
 COPY --from=build /build/src/main/scripts/datasource.cli /opt/jboss/datasource.cli
 
-# Run all setup as root — sed -i needs write access to /opt/jboss/
+# Run setup as root — sed -i needs write access to /opt/jboss/
 USER root
 RUN mkdir -p /opt/jboss/hhsdb && \
     sed -i 's|~/hhsdb/hhsdb|/opt/jboss/hhsdb/hhsdb|g' /opt/jboss/datasource.cli && \
@@ -29,13 +29,7 @@ RUN mkdir -p /opt/jboss/hhsdb && \
 USER jboss
 
 CMD ["/bin/bash", "-c", \
-     "/opt/jboss/wildfly/bin/standalone.sh \
-        -b 0.0.0.0 \
-        -bmanagement 0.0.0.0 \
-        -c standalone-full.xml \
-        --read-only-server-config=false & \
+     "/opt/jboss/wildfly/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0 -c standalone-full.xml & \
       sleep 25 && \
-      /opt/jboss/wildfly/bin/jboss-cli.sh \
-        --connect \
-        --file=/opt/jboss/datasource.cli && \
+      /opt/jboss/wildfly/bin/jboss-cli.sh --connect --file=/opt/jboss/datasource.cli && \
       wait"]
