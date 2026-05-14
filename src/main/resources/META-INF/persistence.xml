@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence
+                 https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
+             version="3.0">
+
+    <persistence-unit name="hhsPU" transaction-type="JTA">
+        <jta-data-source>java:jboss/datasources/HHSDataSource</jta-data-source>
+
+        <!--
+            H2 file-based database stored at ~/hhsdb/hhsdb.mv.db
+            AUTO_SERVER=TRUE allows multiple connections (WildFly + IntelliJ) simultaneously.
+        -->
+
+        <class>gov.state.hhs.model.User</class>
+        <class>gov.state.hhs.model.Client</class>
+        <class>gov.state.hhs.model.ServiceApplication</class>
+        <class>gov.state.hhs.model.CaseNote</class>
+
+        <properties>
+            <!-- Auto-create schema on startup, useful for the demo -->
+            <property name="jakarta.persistence.schema-generation.database.action" value="drop-and-create"/>
+            <property name="jakarta.persistence.schema-generation.create-source" value="metadata"/>
+            <property name="jakarta.persistence.sql-load-script-source" value="META-INF/seed-data.sql"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <!-- Ensures multi-statement seed SQL is executed correctly -->
+            <property name="hibernate.hbm2ddl.import_files_sql_extractor"
+                      value="org.hibernate.tool.schema.internal.script.MultiLineSqlScriptExtractor"/>
+        </properties>
+    </persistence-unit>
+
+</persistence>

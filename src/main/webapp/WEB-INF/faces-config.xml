@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faces-config xmlns="https://jakarta.ee/xml/ns/jakartaee"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                  https://jakarta.ee/xml/ns/jakartaee/web-facesconfig_4_0.xsd"
+              version="4.0">
+
+    <!--
+        Navigation rules are intentionally minimal here.
+        JSF 2+ implicit navigation handles most cases via action method return strings.
+        Add explicit rules only when navigation logic cannot be expressed inline.
+    -->
+
+</faces-config>
