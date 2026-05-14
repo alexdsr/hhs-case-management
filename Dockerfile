@@ -21,31 +21,25 @@ FROM quay.io/wildfly/wildfly:31.0.0.Final-jdk17
 COPY --from=build /build/target/hhs-case-management.war \
      /opt/jboss/wildfly/standalone/deployments/
 
-# Copy the H2 datasource CLI script
-COPY --from=build /build/src/main/scripts/datasource.cli /tmp/datasource.cli
+# Copy datasource CLI script to /opt/jboss (jboss user home) so sed -i
+# can write its temp file — /tmp denies rename for the jboss user
+COPY --from=build /build/src/main/scripts/datasource.cli /opt/jboss/datasource.cli
 
-# Switch to root to set up the datasource, then drop back to jboss
 USER root
-
-# Create directory for the H2 database file
 RUN mkdir -p /opt/jboss/hhsdb && chown jboss:jboss /opt/jboss/hhsdb
-
 USER jboss
 
-# Update the datasource connection URL to use the container path
-# (~/hhsdb_j8 resolves to /opt/jboss/hhsdb in the container)
-RUN sed -i 's|~/hhsdb/hhsdb|/opt/jboss/hhsdb/hhsdb|g' /tmp/datasource.cli
+# Rewrite the H2 path to the container path
+RUN sed -i 's|~/hhsdb/hhsdb|/opt/jboss/hhsdb/hhsdb|g' /opt/jboss/datasource.cli
 
-# Start WildFly, run the CLI script to register the datasource, then leave running
-# Using standalone-full.xml for EJB + JMS support
 CMD ["/bin/bash", "-c", \
      "/opt/jboss/wildfly/bin/standalone.sh \
         -b 0.0.0.0 \
         -bmanagement 0.0.0.0 \
         -c standalone-full.xml \
         --read-only-server-config=false & \
-      sleep 20 && \
+      sleep 25 && \
       /opt/jboss/wildfly/bin/jboss-cli.sh \
         --connect \
-        --file=/tmp/datasource.cli && \
+        --file=/opt/jboss/datasource.cli && \
       wait"]
